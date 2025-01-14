@@ -4,7 +4,7 @@ from salesforce.get_salesforce_access_token import get_salesforce_access_token
 
 def query_salesforce_data() -> List[Dict[str, Any]]:
     """
-    Queries Salesforce to retrieve the required data.
+    Queries Salesforce data using the access token and instance URL obtained from Salesforce.
 
     Returns:
         List[Dict[str, Any]]: A list of dictionaries containing the queried Salesforce data.
@@ -14,15 +14,16 @@ def query_salesforce_data() -> List[Dict[str, Any]]:
     access_token = credentials['access_token']
     instance_url = credentials['instance_url']
 
-    # Connect to Salesforce using the access token and instance URL
+    # Connect to Salesforce using the simple-salesforce library
     sf = Salesforce(instance_url=instance_url, session_id=access_token)
 
     # Define the SOQL query to retrieve the required data
-    # Example query: Replace with the actual query needed
-    query = "SELECT Id, Name FROM Account LIMIT 10"
+    soql_query = "SELECT Id, Name FROM Account LIMIT 10"  # Example query
 
     # Execute the query
-    result = sf.query(query)
+    query_result = sf.query(soql_query)
 
-    # Return the records from the query result
-    return result['records']
+    # Extract the records from the query result
+    records = query_result['records']
+
+    return records

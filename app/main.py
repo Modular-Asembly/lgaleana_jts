@@ -23,3 +23,6 @@ app.include_router(router)
 
 from app.orchestration.run_salesforce_to_google_ads_pipeline import router
 app.include_router(router)
+
+from app.orchestration.run_salesforce_to_google_ads_pipeline import router
+app.include_router(router)

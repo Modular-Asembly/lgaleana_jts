@@ -32,10 +32,8 @@ def get_salesforce_access_token() -> Dict[str, str]:
     response = requests.post(auth_url, data=payload)
     response.raise_for_status()  # Raise an error for bad responses
 
-    # Parse the JSON response
+    # Parse the JSON response to extract the access token and instance URL
     auth_response = response.json()
-
-    # Extract the access token and instance URL
     access_token = auth_response['access_token']
     instance_url = auth_response['instance_url']
 

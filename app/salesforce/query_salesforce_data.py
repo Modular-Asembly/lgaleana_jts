@@ -1,18 +1,29 @@
+import os
 from typing import Any, Dict
 from simple_salesforce import Salesforce
-from app.salesforce.get_salesforce_access_token import get_salesforce_access_token
 
-def query_salesforce_data(query: str) -> Dict[str, Any]:
-    # Step 1: Obtain Salesforce credentials
-    credentials = get_salesforce_access_token()
-    access_token = credentials['access_token']
-    instance_url = credentials['instance_url']
-    
-    # Step 2: Connect to Salesforce API
-    sf = Salesforce(instance_url=instance_url, session_id=access_token)
-    
-    # Step 3: Query the required data
-    result = sf.query(query)
-    
-    # Step 4: Return the data
+def query_salesforce_data(soql_query: str) -> Dict[str, Any]:
+    """
+    Query data from Salesforce using the provided SOQL query.
+
+    :param soql_query: The SOQL query string to execute.
+    :return: The queried data as a dictionary.
+    """
+    # Step 1: Read Salesforce credentials from environment variables
+    sf_username = os.environ["SALESFORCE_USERNAME"]
+    sf_password = os.environ["SALESFORCE_PASSWORD"]
+    sf_security_token = os.environ["SALESFORCE_SECURITY_TOKEN"]
+
+    # Step 2: Connect to Salesforce authentication endpoint
+    sf = Salesforce(
+        username=sf_username,
+        password=sf_password,
+        security_token=sf_security_token
+    )
+
+    # Step 3: Use these credentials to connect to Salesforce API
+    # Step 4: Query the required data
+    result = sf.query(soql_query)
+
+    # Step 5: Return the data
     return result

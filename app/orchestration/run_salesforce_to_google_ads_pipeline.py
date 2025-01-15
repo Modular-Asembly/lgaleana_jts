@@ -37,11 +37,9 @@ def run_salesforce_to_google_ads_pipeline() -> PipelineOutput:
                 if not session.query(Opportunity).filter(Opportunity.Id == record['Id'].__str__()).first():
                     new_opportunity = Opportunity(
                         Id=record['Id'].__str__(),
-                        GCLID=record['GCLID__c'].__str__(),
+                        GCLID__c=record['GCLID__c'].__str__(),
                         CreatedDate=record['CreatedDate'],
-                        Admission_Date=record['Admission_Date__c'],
-                        type='Opportunity',
-                        url=f"https://example.salesforce.com/{record['Id'].__str__()}"
+                        Admission_Date__c=record['Admission_Date__c']
                     )
                     session.add(new_opportunity)
             session.commit()

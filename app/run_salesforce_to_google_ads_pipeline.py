@@ -6,7 +6,7 @@ from app.query_salesforce_data import query_salesforce_data
 from app.format_data_for_google_ads import format_data_for_google_ads
 from app.upload_to_google_ads import upload_to_google_ads
 from app.Opportunity import Opportunity
-from app.get_sql_session import get_sql_session
+from app.modassembly.database.sql.get_sql_session import get_sql_session
 
 router = APIRouter()
 

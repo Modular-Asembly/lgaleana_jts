@@ -5,3 +5,5 @@ venv
 config.json
 conversation.json
 test.db
+deploy.sh
+Dockerfile

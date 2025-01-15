@@ -18,8 +18,8 @@ app.add_middleware(
 
 # Routers
 
-from app.Opportunity import Opportunity
-from app.run_salesforce_to_google_ads_pipeline import router
+from app.pipeline.Opportunity import Opportunity
+from app.pipeline.run_upload_pipeline import router
 app.include_router(router)
 
 # Database

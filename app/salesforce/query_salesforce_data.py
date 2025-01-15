@@ -6,10 +6,10 @@ from app.salesforce.get_auth_data import get_auth_data
 def query_salesforce_data() -> List[Dict[str, Any]]:
     # Retrieve Salesforce authentication data
     auth_data = get_auth_data()
-    access_token = auth_data['access_token']
     instance_url = auth_data['instance_url']
+    access_token = auth_data['access_token']
 
-    # Calculate the date 90 days ago
+    # Calculate the date 90 days ago from today
     ninety_days_ago = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     # Construct the SOQL query
@@ -21,7 +21,7 @@ def query_salesforce_data() -> List[Dict[str, Any]]:
     )
 
     # Construct the query URL
-    query_url = f"{instance_url}/services/data/v52.0/query?q={soql_query}"
+    query_url = f"{instance_url}/services/data/vXX.X/query?q={soql_query}"
 
     # Send a GET request to the query URL with the appropriate headers
     headers = {

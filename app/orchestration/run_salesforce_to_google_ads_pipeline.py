@@ -16,36 +16,44 @@ class PipelineOutput(BaseModel):
 
 @router.post("/run_pipeline", response_model=PipelineOutput)
 def run_salesforce_to_google_ads_pipeline() -> PipelineOutput:
+    """
+    Run the pipeline to transfer data from Salesforce to Google Ads.
+
+    This endpoint retrieves data from Salesforce, checks for existing records
+    in the Opportunity database model, formats the data for Google Ads, and
+    uploads it to Google Ads.
+
+    Returns:
+        PipelineOutput: A response model indicating the success or failure of the pipeline.
+    """
     try:
-        # Step 1: Retrieve data from Salesforce
+        # Retrieve data from Salesforce
         salesforce_data = query_salesforce_data()
 
-        # Step 2: Check if each record exists in the Opportunity dbmodel
+        # Open a new SQL session
         with get_sql_session() as session:
+            # Check and store new records in the Opportunity dbmodel
             for record in salesforce_data:
-                opportunity = session.query(Opportunity).filter_by(Id=record['Id'].__str__()).first()
-                if not opportunity:
-                    # Step 3: Store it in the Opportunity dbmodel if it doesn't exist
+                if not session.query(Opportunity).filter(Opportunity.Id == record['Id'].__str__()).first():
                     new_opportunity = Opportunity(
                         Id=record['Id'].__str__(),
                         GCLID=record['GCLID__c'].__str__(),
                         CreatedDate=record['CreatedDate'],
                         Admission_Date=record['Admission_Date__c'],
-                        type=record['attributes']['type'].__str__(),
-                        url=record['attributes']['url'].__str__()
+                        type='Opportunity',
+                        url=f"https://example.salesforce.com/{record['Id'].__str__()}"
                     )
                     session.add(new_opportunity)
-                    session.commit()
+            session.commit()
 
-        # Step 4: Format the data for Google Ads
+        # Format the data for Google Ads
         formatted_data = format_data_for_google_ads(salesforce_data)
 
-        # Step 5: Upload the formatted data to Google Ads
+        # Upload the formatted data to Google Ads
         for data in formatted_data:
             upload_to_google_ads(data)
 
-        # Step 6: Return a PipelineOutput indicating success
         return PipelineOutput(success=True, message="Pipeline executed successfully.")
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Pipeline execution failed: {str(e)}")

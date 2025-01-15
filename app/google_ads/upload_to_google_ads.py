@@ -7,10 +7,10 @@ def upload_to_google_ads(formatted_data: Dict[str, str]) -> None:
     client = GoogleAdsClient.load_from_storage()
 
     # Get the CampaignService client
-    campaign_service = client.get_service("CampaignService", version="v11")
+    campaign_service = client.get_service("CampaignService")
 
     # Create a campaign operation
-    campaign_operation = client.get_type("CampaignOperation", version="v11")
+    campaign_operation = client.get_type("CampaignOperation")
     campaign = campaign_operation.create
 
     # Set campaign details from formatted_data
@@ -26,9 +26,9 @@ def upload_to_google_ads(formatted_data: Dict[str, str]) -> None:
         )
         print(f"Created campaign with resource name: {response.results[0].resource_name}")
     except GoogleAdsException as ex:
-        print(f"Request with ID '{ex.request_id}' failed with status '{ex.error.code().name}' and includes the following errors:")
+        print(f"Request failed with status {ex.error.code().name} and includes the following errors:")
         for error in ex.failure.errors:
-            print(f"\tError with message '{error.message}'.")
+            print(f"\tError with message: {error.message}")
             if error.location:
                 for field_path_element in error.location.field_path_elements:
                     print(f"\t\tOn field: {field_path_element.field_name}")

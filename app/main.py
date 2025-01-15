@@ -21,3 +21,8 @@ app.add_middleware(
 from app.Opportunity import Opportunity
 from app.run_salesforce_to_google_ads_pipeline import router
 app.include_router(router)
+
+# Database
+
+from app.modassembly.database.sql.get_sql_session import Base, engine
+Base.metadata.create_all(engine)

@@ -19,8 +19,5 @@ app.add_middleware(
 # Routers
 
 from app.Opportunity import Opportunity
-from app.models.Opportunity import Opportunity
-from app.orchestration.run_salesforce_to_google_ads_pipeline import router
-app.include_router(router)
 from app.run_salesforce_to_google_ads_pipeline import router
 app.include_router(router)

@@ -1,19 +1,18 @@
-from typing import Any, Dict
-from app.storage.store_data_in_gcs import store_data_in_gcs
+from typing import List, Dict, Any
+from app.models.Opportunity import Opportunity
 
-def format_data_for_google_ads(salesforce_data: Dict[str, Any]) -> Dict[str, Any]:
-    # Step 2: Transform the data into the format required by Google Ads
-    # This is a simple transformation example. Adjust according to your needs.
-    formatted_data = {
-        "name": salesforce_data.get("Name", ""),
-        "advertising_channel_type": "SEARCH",  # Example static value
-        "status": "ENABLED"  # Example static value
-    }
+def format_data_for_google_ads(salesforce_data: List[Opportunity]) -> List[Dict[str, Any]]:
+    formatted_data = []
 
-    # Step 3: Store the formatted data in a Google Cloud Storage bucket
-    # Convert formatted data to a string or JSON format for storage
-    formatted_data_str = str(formatted_data)
-    store_data_in_gcs(formatted_data_str, "formatted_data.json")
+    for record in salesforce_data:
+        formatted_record = {
+            "id": record.Id.__str__(),
+            "gclid": record.GCLID.__str__() if record.GCLID else None,
+            "created_date": record.CreatedDate.isoformat(),
+            "admission_date": record.Admission_Date.isoformat() if record.Admission_Date else None,
+            "type": record.type.__str__(),
+            "url": record.url.__str__()
+        }
+        formatted_data.append(formatted_record)
 
-    # Step 4: Return the formatted data
     return formatted_data

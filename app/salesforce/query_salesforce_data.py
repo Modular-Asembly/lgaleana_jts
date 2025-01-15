@@ -1,29 +1,38 @@
-import os
-from typing import Any, Dict
-from simple_salesforce import Salesforce
+import requests
+from typing import List, Dict, Any
+from datetime import datetime, timedelta
+from app.salesforce.get_auth_data import get_auth_data
 
-def query_salesforce_data(soql_query: str) -> Dict[str, Any]:
-    """
-    Query data from Salesforce using the provided SOQL query.
+def query_salesforce_data() -> List[Dict[str, Any]]:
+    # Retrieve Salesforce authentication data
+    auth_data = get_auth_data()
+    access_token = auth_data['access_token']
+    instance_url = auth_data['instance_url']
 
-    :param soql_query: The SOQL query string to execute.
-    :return: The queried data as a dictionary.
-    """
-    # Step 1: Read Salesforce credentials from environment variables
-    sf_username = os.environ["SALESFORCE_USERNAME"]
-    sf_password = os.environ["SALESFORCE_PASSWORD"]
-    sf_security_token = os.environ["SALESFORCE_SECURITY_TOKEN"]
+    # Calculate the date 90 days ago
+    ninety_days_ago = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    # Step 2: Connect to Salesforce authentication endpoint
-    sf = Salesforce(
-        username=sf_username,
-        password=sf_password,
-        security_token=sf_security_token
+    # Construct the SOQL query
+    soql_query = (
+        "SELECT Id, GCLID__c, CreatedDate, Admission_Date__c "
+        "FROM Opportunity "
+        "WHERE StageName IN ('Admitted', 'Alumni') "
+        f"AND CreatedDate >= {ninety_days_ago}"
     )
 
-    # Step 3: Use these credentials to connect to Salesforce API
-    # Step 4: Query the required data
-    result = sf.query(soql_query)
+    # Construct the query URL
+    query_url = f"{instance_url}/services/data/v52.0/query?q={soql_query}"
 
-    # Step 5: Return the data
-    return result
+    # Send a GET request to the query URL with the appropriate headers
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json'
+    }
+    response = requests.get(query_url, headers=headers)
+    response.raise_for_status()
+
+    # Filter the results to include only records where GCLID__c is not None
+    records = response.json().get('records', [])
+    filtered_records = [record for record in records if record.get('GCLID__c') is not None]
+
+    return filtered_records
